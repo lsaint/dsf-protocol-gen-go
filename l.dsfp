@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="GBK" ?>
+<dsf>
+    <protocol ns="proto">
+
+    <entity name="OK" value="1" type="numeric_constant"/>
+
+    <entity name="YYGoProto1" type="object" desc="测试协议1">
+        <field name="uid"  type="uint32" desc="状态码1"  />
+        <field name="name" type="string" desc="状态码2"  />
+        <field name="pets" type="vector" value_type="string"  desc="状态码3" />
+        <field name="mm"   type="map" key_type="int32" value_type="string" desc="hehe"/>
+        <field name="bin"   type="binary"  desc="22 22"/>
+    </entity>
+		
+    </protocol>
+</dsf>
