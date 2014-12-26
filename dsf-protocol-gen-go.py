@@ -22,6 +22,15 @@ def utf8(s):
 
 ### 
 
+header = '''package {0}
+
+import (
+	"fmt"
+)
+
+'''
+
+
 def typeconv(field):
     t = field.attrib.get("type").lower()
     if t in ("int8","uint8","int16","uint16","int32", "uint32","int64", "uint64", "string"):
