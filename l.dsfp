@@ -3,6 +3,7 @@
     <protocol ns="proto">
 
     <entity name="OK" value="1" type="numeric_constant"/>
+    <entity name="LOGO" value="lSaint" type="string_constant"/>
 
     <entity name="YYGoProto1" type="object" desc="²âÊÔÐ­Òé1">
         <field name="uid"  type="uint32" desc="×´Ì¬Âë1"  />

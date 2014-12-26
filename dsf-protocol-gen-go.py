@@ -37,6 +37,11 @@ import (
 
 '''
 
+conster = '''const (
+{0})
+
+'''
+
 
 def typeconv(field):
     t = field.attrib.get("type").lower()
@@ -125,10 +130,18 @@ def genObjectField(field):
 ###
 
 def genConstNum(entity):
+    k = entity.attrib.get("name")
+    v = entity.attrib.get("value")
+    if k and v:
+        return "\t{0} = {1}\n".format(k, v)
     return ""
 
 
 def genConstStr(entity):
+    k = entity.attrib.get("name")
+    v = entity.attrib.get("value")
+    if k and v:
+        return '\t{0} = "{1}"\n'.format(k, v)
     return ""
 
 
@@ -163,5 +176,7 @@ for protocol in root:
             elif t == "string_constant":
                 consts = consts + genConstStr(entity)
 
+        if consts:
+            consts = conster.format(consts)
         print "{0}{1}{2}".format(header, consts, entities)
 
