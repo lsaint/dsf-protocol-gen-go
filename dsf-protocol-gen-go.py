@@ -60,21 +60,53 @@ def typeconv(field):
     exit(-1)
 
 
+def iscommon(t):
+    return t in ("int8","uint8","int16","uint16","int32", "uint32","int64", "uint64")
+
+
 def writeconv(field):
     t = field.attrib.get("type").lower()
     n = field.attrib.get("name").title()
-    if t in ("int8","uint8","int16","uint16","int32", "uint32","int64", "uint64"):
+    if iscommon(t):
         return "\tWriteCommon(buffer, L.{0})\n".format(n)
     if t == "string":
         return "\tWriteString(buffer, L.{0})\n".format(n)
     if t in ("vector", "list", "set"):
-        return "\tWriteList(buffer, L.{0})\n".format(n)
+        vt = field.attrib.get("value_type").lower()
+        return wrap_WriteList(vt, n)
     if t == "map":
-        return "\tWriteMap(buffer, L.{0})\n".format(n)
+        vk = field.attrib.get("key_type").lower()
+        vt = field.attrib.get("value_type").lower()
+        return wrap_WriteMap(vk, vt, n)
     if t == "binary":
         return "\tWriteBinary(buffer, L.{0})\n".format(n)
     print "write unsupport field type", t
     exit(-1)
+
+
+writelist = """\tWriteCommon(uint32(len(L.{0})))
+\tfor _, item := range L.{0} {{
+\t    Write{1}(buffer, item)
+\t}}
+"""
+def wrap_WriteList(vt, n):
+    return writelist.format(n, get_WriteSubfix(vt))
+
+
+def get_WriteSubfix(i):
+    if iscommon(i):
+        return "Common"
+    return "String"
+
+
+writemap = """\tWriteCommon(uint32(len(L.{0})))
+\tfor k, v := range L.{0} {{
+\t    Write{1}(buffer, k)
+\t    Write{2}(buffer, v)
+\t}}
+"""
+def wrap_WriteMap(vk, vt, n):
+    return writemap.format(n, get_WriteSubfix(vk), get_WriteSubfix(vt))
 
 
 def readconv(field):
