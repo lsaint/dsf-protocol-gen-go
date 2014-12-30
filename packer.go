@@ -38,20 +38,20 @@ func WriteBinary(buffer *bytes.Buffer, b []byte) {
 //	WriteString(buffer, strconv.FormatFloat(f, 'f', 5, 64))
 //}
 
-func WriteList(buffer *bytes.Buffer, lt []string) {
-	binary.Write(buffer, binary.LittleEndian, uint32(len(lt)))
-	for _, item := range lt {
-		WriteString(buffer, item)
-	}
-}
+//func WriteList(buffer *bytes.Buffer, lt []string) {
+//	binary.Write(buffer, binary.LittleEndian, uint32(len(lt)))
+//	for _, item := range lt {
+//		WriteString(buffer, item)
+//	}
+//}
 
-func WriteMap(buffer *bytes.Buffer, m map[int32]string) {
-	binary.Write(buffer, binary.LittleEndian, uint32(len(m)))
-	for k, v := range m {
-		WriteCommon(buffer, k)
-		WriteString(buffer, v)
-	}
-}
+//func WriteMap(buffer *bytes.Buffer, m map[int32]string) {
+//	binary.Write(buffer, binary.LittleEndian, uint32(len(m)))
+//	for k, v := range m {
+//		WriteCommon(buffer, k)
+//		WriteString(buffer, v)
+//	}
+//}
 
 //
 
@@ -73,26 +73,26 @@ func ReadBinary(buffer *bytes.Buffer) (b []byte, err error) {
 	return
 }
 
-func ReadList(buffer *bytes.Buffer) (lt []string, err error) {
-	var l uint32
-	binary.Read(buffer, binary.LittleEndian, &l)
-	lt = make([]string, int(l))
-	for i := 0; i < int(l); i++ {
-		lt[i], _ = ReadString(buffer)
-	}
-	return
-}
-
-func ReadMap(buffer *bytes.Buffer) (m map[int32]string, err error) {
-	var l uint32
-	binary.Read(buffer, binary.LittleEndian, &l)
-	m = make(map[int32]string)
-	var k int32
-	var v string
-	for i := 0; i < int(l); i++ {
-		ReadCommon(buffer, &k)
-		v, _ = ReadString(buffer)
-		m[k] = v
-	}
-	return
-}
+//func ReadList(buffer *bytes.Buffer) (lt []string, err error) {
+//	var l uint32
+//	binary.Read(buffer, binary.LittleEndian, &l)
+//	lt = make([]string, int(l))
+//	for i := 0; i < int(l); i++ {
+//		lt[i], _ = ReadString(buffer)
+//	}
+//	return
+//}
+//
+//func ReadMap(buffer *bytes.Buffer) (m map[int32]string, err error) {
+//	var l uint32
+//	binary.Read(buffer, binary.LittleEndian, &l)
+//	m = make(map[int32]string)
+//	var k int32
+//	var v string
+//	for i := 0; i < int(l); i++ {
+//		ReadCommon(buffer, &k)
+//		v, _ = ReadString(buffer)
+//		m[k] = v
+//	}
+//	return
+//}

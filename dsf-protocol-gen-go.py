@@ -84,29 +84,29 @@ def writeconv(field):
     exit(-1)
 
 
-writelist = """\tWriteCommon(uint32(len(L.{0})))
+writelist = """\tWriteCommon(buffer, uint32(len(L.{0})))
 \tfor _, item := range L.{0} {{
 \t    Write{1}(buffer, item)
 \t}}
 """
 def wrap_WriteList(vt, n):
-    return writelist.format(n, get_WriteSubfix(vt))
+    return writelist.format(n, get_subfix(vt))
 
 
-def get_WriteSubfix(i):
+def get_subfix(i):
     if iscommon(i):
         return "Common"
     return "String"
 
 
-writemap = """\tWriteCommon(uint32(len(L.{0})))
+writemap = """\tWriteCommon(buffer, uint32(len(L.{0})))
 \tfor k, v := range L.{0} {{
 \t    Write{1}(buffer, k)
 \t    Write{2}(buffer, v)
 \t}}
 """
 def wrap_WriteMap(vk, vt, n):
-    return writemap.format(n, get_WriteSubfix(vk), get_WriteSubfix(vt))
+    return writemap.format(n, get_subfix(vk), get_subfix(vt))
 
 
 def readconv(field):
@@ -117,18 +117,51 @@ def readconv(field):
     if t == "string":
         return "\tL.{0}, _ = ReadString(buffer)\n".format(n)
     if t in ("vector", "list", "set"):
-        return "\tL.{0}, _ = ReadList(buffer)\n".format(n)
+        vt = field.attrib.get("value_type").lower()
+        return wrap_ReadList(n, vt)
     if t == "map":
-        return "\tL.{0}, _ = ReadMap(buffer)\n".format(n)
+        vk = field.attrib.get("key_type").lower()
+        vt = field.attrib.get("value_type").lower()
+        return wrap_ReadMap(n, vk, vt)
     if t == "binary":
         return "\tL.{0}, _ = ReadBinary(buffer)\n".format(n)
     print "read unsupport field type", t
     exit(-1)
 
 
+readlist = """\tvar len_{0} uint32
+\tReadCommon(buffer, &len_{0})
+\tL.{0} = make([]{1}, int(len_{0}))
+\tfor i := 0; i < int(len_{0}); i++ {{
+\t\t{2}
+\t\tL.{0}[i] = {0}_v
+\t}}
+"""
+def wrap_ReadList(n, vt):
+    return readlist.format(n, vt, get_ReadInnerLoop(n+"_v", vt))
+
+
+def get_ReadInnerLoop(var_name, vt):
+    if iscommon(vt):
+        return "var {0} {1}\n\t\tReadCommon(buffer, &{0})".format(var_name, vt)
+    return "{0}, _ := ReadString(buffer)".format(var_name)
+
+
+readmap = """\tvar len_{0} uint32
+\tReadCommon(buffer, &len_{0})
+\tL.{0} = make(map[{1}]{2})
+\tfor i := 0; i < int(len_{0}); i++ {{
+\t\t{3}
+\t\t{4}
+\t\tL.{0}[{0}_k] = {0}_v
+\t}}
+"""
+def wrap_ReadMap(n, vk, vt):
+    return readmap.format(n, vk, vt, get_ReadInnerLoop(n+"_k", vk), get_ReadInnerLoop(n+"_v", vt))
+
 
 def genObject(entity):
-    struct_name = entity.attrib.get("name").title()
+    struct_name = entity.attrib.get("name")
     # define
     ret = "type {0} struct {1}\n".format(struct_name, "{")
     for field in entity:

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="GBK" ?>
 <dsf>
-    <protocol ns="proto">
+    <protocol ns="yyprotogo">
 
     <entity name="AUTHOR" value="lSaint" type="string_constant"/>
     <entity name="VERSION" value="1" type="numeric_constant"/>
