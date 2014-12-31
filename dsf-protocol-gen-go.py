@@ -162,8 +162,9 @@ def wrap_ReadMap(n, vk, vt):
 
 def genObject(entity):
     struct_name = entity.attrib.get("name")
+    struct_desc = utf8(entity.attrib.get("desc")) or ""
     # define
-    ret = "type {0} struct {1}\n".format(struct_name, "{")
+    ret = "//{0}\ntype {1} struct {{\n".format(struct_desc, struct_name)
     for field in entity:
         #print "--", field.tag, field.attrib
         ret = "{0}{1}".format(ret, genObjectField(field))
