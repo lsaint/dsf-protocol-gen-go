@@ -127,7 +127,7 @@ func Unpack(buf []byte) (uri uint32, ret []byte, err error) {
 		return
 	}
 	var length uint32
-	buffer := new(bytes.Buffer)
+	buffer := bytes.NewBuffer(buf)
 	ReadCommon(buffer, &length)
 	buffer.Next(2)
 	ReadCommon(buffer, &uri)
