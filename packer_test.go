@@ -2,6 +2,10 @@ package yyprotogo
 
 import "testing"
 
+// 1) gen: dsf-protocol-gen-go l.dsfp > l.go
+// 2) remove l.go line: import github.com/lsaint/yyprotogo
+// 3) run: go test
+
 func TestPack(t *testing.T) {
 	yp1 := &YYGoProto1{
 		Uid:  uint32(10000),

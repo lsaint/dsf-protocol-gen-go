@@ -3,6 +3,18 @@ package yyprotogo
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
+)
+
+/*
+Header:
+	Length 	uint32
+	magic	uint16
+	uri		uint32
+*/
+
+const (
+	LEN_HEADER = uint32(4 + 2 + 4)
 )
 
 type YYMarshalable interface {
@@ -96,3 +108,29 @@ func ReadBinary(buffer *bytes.Buffer) (b []byte, err error) {
 //	}
 //	return
 //}
+
+func Pack(uri uint32, buf []byte) (ret []byte, err error) {
+	length := LEN_HEADER + uint32(len(buf))
+	var magic uint16
+	buffer := new(bytes.Buffer)
+	WriteCommon(buffer, length)
+	WriteCommon(buffer, magic)
+	WriteCommon(buffer, uri)
+	binary.Write(buffer, binary.LittleEndian, buf)
+	ret = buffer.Bytes()
+	return
+}
+
+func Unpack(buf []byte) (uri uint32, ret []byte, err error) {
+	if uint32(len(buf)) < LEN_HEADER {
+		err = errors.New("yyprotogo insufficient buffer")
+		return
+	}
+	var length uint32
+	buffer := new(bytes.Buffer)
+	ReadCommon(buffer, &length)
+	buffer.Next(2)
+	ReadCommon(buffer, &uri)
+	ret = buffer.Next(int(length - LEN_HEADER))
+	return
+}
