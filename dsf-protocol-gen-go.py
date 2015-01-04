@@ -166,7 +166,6 @@ def genObject(entity):
     # define
     ret = "//{0}\ntype {1} struct {{\n".format(struct_desc, struct_name)
     for field in entity:
-        #print "--", field.tag, field.attrib
         ret = "{0}{1}".format(ret, genObjectField(field))
     ret = ret + "}\n\n"
 
@@ -213,13 +212,15 @@ def genConstStr(entity):
 
 ###
 
-if len(sys.argv) != 2:
-    print "miss dsfp file"
+if len(sys.argv) < 2:
+    print "missing dsfp file"
+    print "eg. >>dsf-protocol-gen-go l.dsfp gbk"
     exit(0)
 
 dsfp = sys.argv[1]
+encoding = sys.argv[2] if len(sys.argv) > 2 else "gbk"
 
-tree = parser(dsfp, "gbk")
+tree = parser(dsfp, encoding)
 root = tree.getroot()
 
 for protocol in root:
