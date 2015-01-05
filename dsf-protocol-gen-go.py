@@ -183,15 +183,15 @@ def genObject(entity):
     ret = ret + "}\n\n"
 
     # func Marshal
-    ret = ret + "func (L *{0}) Marshal() ([]byte, error) {1}\n{2}".format(
-            struct_name, "{", "\tbuffer := new(bytes.Buffer)\n")
+    ret = ret + "func (L *{0}) Marshal() ([]byte, error) {{\n{1}".format(
+            struct_name, "\tbuffer := new(bytes.Buffer)\n")
     for field in entity:
         ret = "{0}{1}".format(ret, writeconv(field))
     ret = ret + "\treturn buffer.Bytes(), nil\n}\n\n"
 
     # func Unmarshal
-    ret = ret + "func (L *{0}) Unmarshal(b []byte) error {1}\n{2}".format(
-            struct_name, "{", "\tbuffer := bytes.NewBuffer(b)\n")
+    ret = ret + "func (L *{0}) Unmarshal(b []byte) error {{\n{1}".format(
+            struct_name, "\tbuffer := bytes.NewBuffer(b)\n")
     for field in entity:
         ret = "{0}{1}".format(ret, readconv(field))
     ret = ret + "\treturn nil\n}\n\n"
