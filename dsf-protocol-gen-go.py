@@ -176,27 +176,31 @@ def wrap_ReadMap(n, vk, vt):
 def genObject(entity):
     struct_name = entity.attrib.get("name")
     struct_desc = utf8(entity.attrib.get("desc")) or ""
-    # define
-    ret = "//{0}\ntype {1} struct {{\n".format(struct_desc, struct_name)
-    for field in entity:
-        ret = "{0}{1}".format(ret, genObjectField(field))
-    ret = ret + "}\n\n"
 
-    # func Marshal
-    ret = ret + "func (L *{0}) Marshal() ([]byte, error) {{\n{1}".format(
-            struct_name, "\tbuffer := new(bytes.Buffer)\n")
-    for field in entity:
-        ret = "{0}{1}".format(ret, writeconv(field))
-    ret = ret + "\treturn buffer.Bytes(), nil\n}\n\n"
+    define_head = "//{0}\ntype {1} struct {{\n".format(struct_desc, struct_name)
+    define_body = ""
+    define_tail = "}\n\n"
 
-    # func Unmarshal
-    ret = ret + "func (L *{0}) Unmarshal(b []byte) error {{\n{1}".format(
-            struct_name, "\tbuffer := bytes.NewBuffer(b)\n")
-    for field in entity:
-        ret = "{0}{1}".format(ret, readconv(field))
-    ret = ret + "\treturn nil\n}\n\n"
+    marshal_head = "func (L *{0}) Marshal() ([]byte, error) {{\n{1}".format(
+                        struct_name, "\tbuffer := new(bytes.Buffer)\n")
+    marshal_body = ""
+    marshal_tail = "\treturn buffer.Bytes(), nil\n}\n\n"
 
-    return ret
+    unmarshal_head = "func (L *{0}) Unmarshal(b []byte) error {{\n{1}".format(
+                        struct_name, "\tbuffer := bytes.NewBuffer(b)\n")
+    unmarshal_body = ""
+    unmarshal_tail = "\treturn nil\n}\n\n"
+
+    for field in entity:
+        define_body     = "{0}{1}".format(define_body, genObjectField(field))
+        marshal_body    = "{0}{1}".format(marshal_body, writeconv(field))
+        unmarshal_body  = "{0}{1}".format(unmarshal_body, readconv(field))
+
+    define_complete     = "{0}{1}{2}".format(define_head, define_body, define_tail)
+    marshal_complete    = "{0}{1}{2}".format(marshal_head, marshal_body, marshal_tail)
+    unmarshal_complete  = "{0}{1}{2}".format(unmarshal_head, unmarshal_body, unmarshal_tail)
+
+    return "{0}{1}{2}".format(define_complete, marshal_complete, unmarshal_complete)
 
 
 def genObjectField(field):
