@@ -55,6 +55,9 @@ func init() {{
 
 '''
 
+# cache for parent entity
+g_parent_body = {}
+
 
 def typeconv(field):
     t = field.attrib.get("type").lower()
@@ -192,9 +195,21 @@ def genObject(entity):
     unmarshal_tail = "\treturn nil\n}\n\n"
 
     for field in entity:
+        if field.tag == "parent":
+            parent_name = field.attrib.get("name")
+            parent_body = g_parent_body.get(parent_name)
+            if not parent_body:
+                print parent_name, "not found"
+                exit(-1)
+            define_body += parent_body[0]
+            marshal_body += parent_body[1]
+            unmarshal_body += parent_body[2]
+            continue
         define_body     = "{0}{1}".format(define_body, genObjectField(field))
         marshal_body    = "{0}{1}".format(marshal_body, writeconv(field))
         unmarshal_body  = "{0}{1}".format(unmarshal_body, readconv(field))
+
+    g_parent_body[struct_name] = (define_body, marshal_body, unmarshal_body)
 
     define_complete     = "{0}{1}{2}".format(define_head, define_body, define_tail)
     marshal_complete    = "{0}{1}{2}".format(marshal_head, marshal_body, marshal_tail)
@@ -208,7 +223,6 @@ def genObjectField(field):
                              typeconv(field),
                              utf8(field.attrib.get("desc")) or "")
 
-
 ###
 
 def genUri(entity):
@@ -221,9 +235,9 @@ def genUri(entity):
     if entity.attrib.get("compat") == "true":
         compat = True
     if compat:
-        return '\t"{0}"\t: (uint32({1}) << 8) | uint32({2}),\n'.format(name, service_id, command_id)
+        return '\t"{0}":\t(uint32({1}) << 8) | uint32({2}),\n'.format(name, service_id, command_id)
     else:
-        return '\t"{0}"\t: (uint32({1}) << 16) | uint32({2}),\n'.format(name, service_id, command_id)
+        return '\t"{0}":\t(uint32({1}) << 16) | uint32({2}),\n'.format(name, service_id, command_id)
 
 
 def genConstNum(entity):
