@@ -9,8 +9,8 @@ import (
 /*
 Header:
 	Length 	uint32
-	magic	uint16
 	uri		uint32
+	magic	uint16
 */
 
 const (
@@ -114,8 +114,8 @@ func Pack(uri uint32, buf []byte) (ret []byte, err error) {
 	var magic uint16
 	buffer := new(bytes.Buffer)
 	WriteCommon(buffer, length)
-	WriteCommon(buffer, magic)
 	WriteCommon(buffer, uri)
+	WriteCommon(buffer, magic)
 	binary.Write(buffer, binary.LittleEndian, buf)
 	ret = buffer.Bytes()
 	return
@@ -129,8 +129,8 @@ func Unpack(buf []byte) (uri uint32, ret []byte, err error) {
 	var length uint32
 	buffer := bytes.NewBuffer(buf)
 	ReadCommon(buffer, &length)
-	buffer.Next(2)
 	ReadCommon(buffer, &uri)
+	buffer.Next(2)
 	ret = buffer.Next(int(length - LEN_HEADER))
 	return
 }
