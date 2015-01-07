@@ -45,7 +45,8 @@ g_const = '''const (
 g_uri = '''var URI = map[string]uint32 {{
 {0}}}
 
-var URI_R  map[uint32]string
+var URI_R = map[uint32]string {{
+}}
 
 func init() {{
     for name, uri := range URI {{
