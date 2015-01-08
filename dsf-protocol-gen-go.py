@@ -236,7 +236,7 @@ def genUri(entity):
     if entity.attrib.get("compat") == "true":
         compat = True
     if compat:
-        return '\t"{0}":\t(uint32({1}) << 8) | uint32({2}),\n'.format(name, service_id, command_id)
+        return '\t"{0}":\t(uint32({2}) << 8) | uint32({1}),\n'.format(name, service_id, command_id)
     else:
         return '\t"{0}":\t(uint32({1}) << 16) | uint32({2}),\n'.format(name, service_id, command_id)
 
